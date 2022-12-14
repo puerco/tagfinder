@@ -13,16 +13,18 @@ func TestScanPath(t *testing.T) {
 }
 
 func TestScanFileWithOptions(t *testing.T) {
-	tags, err := scanFileWithOptions("./test_data/example.c", &Options{Lines: 100})
+	di := defaultImplementation{}
+	tags, err := di.ScanFile(&Options{Lines: 100}, "./test_data/example.c")
 	require.NoError(t, err)
 	require.Len(t, tags, 3)
 
-	tags, err = scanFileWithOptions("./test_data/example.c", &Options{Lines: 3})
+	tags, err = di.ScanFile(&Options{Lines: 3}, "./test_data/example.c")
 	require.NoError(t, err)
 	require.Len(t, tags, 2)
 }
 
 func TestParseLine(t *testing.T) {
+	di := defaultImplementation{}
 	for _, tc := range []struct {
 		shouldNil bool
 		tag       string
@@ -46,7 +48,7 @@ func TestParseLine(t *testing.T) {
 			false, "# SPDX-FileCopyrightText: 2019 Jane Doe <jane@example.com>", "FileCopyrightText", "2019 Jane Doe <jane@example.com>",
 		},
 	} {
-		res := ParseLine(tc.tag)
+		res := di.ParseLine(tc.tag)
 		if tc.shouldNil {
 			require.Nil(t, res)
 		} else {
