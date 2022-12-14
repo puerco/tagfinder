@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/chainguard-dev/tagfinder/pkg/spdx"
@@ -27,6 +28,9 @@ func (di *defaultImplementation) BuildFileList(path string) ([]string, error) {
 	if err := fs.WalkDir(
 		os.DirFS(path), ".", func(path string, entry fs.DirEntry, err error,
 		) error {
+			if err != nil {
+				return err
+			}
 			if entry.Type().IsRegular() {
 				fileList = append(fileList, path)
 			}
@@ -57,7 +61,7 @@ func (di *defaultImplementation) ScanPath(opts *Options, path string) ([]spdx.Ta
 	for _, filePath := range fileList {
 		filePath := filePath
 		go func(f string) {
-			foundTags, err := di.ScanFile(opts, filePath)
+			foundTags, err := di.ScanFile(opts, filepath.Join(path, filePath))
 			if err != nil {
 				t.Done(err)
 				return

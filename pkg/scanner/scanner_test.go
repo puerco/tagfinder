@@ -7,9 +7,14 @@ import (
 )
 
 func TestScanPath(t *testing.T) {
-	s := Scanner{}
-	_, err := s.ScanPath("./test_data/example.c")
+	di := defaultImplementation{}
+
+	// ScanPath on a file errors
+	_, err := di.ScanPath(&Options{}, "./test_data/example.c")
 	require.Error(t, err)
+
+	_, err = di.ScanPath(&Options{}, "./test_data")
+	require.NoError(t, err)
 }
 
 func TestScanFileWithOptions(t *testing.T) {
